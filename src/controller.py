@@ -1,40 +1,9 @@
 """
-controller.py
--------------
-Closed-loop auto-driller control logic for torsional vibration mitigation.
+controller.py — Closed-loop auto-driller for torsional vibration mitigation.
 
-Architecture
-~~~~~~~~~~~~
-Implements a proportional-integral (PI) surface control strategy inspired
-by Soft Torque Rotary System (STRS) principles used in rig automation:
-
-  1. Monitor SSI continuously (computed from surface telemetry).
-  2. On sustained detection: reduce WOB proportionally to SSI severity.
-  3. Adjust surface RPM setpoint upward to build torsional energy in the
-     string (a technique that helps break the bit free from the slip phase).
-  4. Hold adjustments until SSI falls below the recovery threshold.
-  5. Ramp WOB back to nominal once stability is confirmed (≥ 60 seconds).
-
-This is a *deterministic rule-based* controller — the dominant architecture
-in safety-critical rig automation systems because it is auditable,
-predictable, and certifiable (unlike ML black-box approaches).
-
-State machine
-~~~~~~~~~~~~~
-    NORMAL ──detect──► DETECTING ──sustained──► MITIGATING
-       ▲                  │ false alarm              │
-       │                  ▼                          │ ssi < recovery_threshold
-       └───recovered──  NORMAL              RECOVERING
-                                               │
-                                               └──relapse──► MITIGATING
-
-Control equations
-~~~~~~~~~~~~~~~~~
-    WOB_set = WOB_nominal × (1 - Kp × (SSI - SSI_threshold))
-              clamped to [WOB_min_fraction × WOB_nominal, WOB_nominal]
-
-    RPM_set = max(RPM_nominal, RPM_nominal + Kp_rpm × (SSI - SSI_threshold) × 10)
-              clamped to [RPM_nominal, RPM_nominal + RPM_max_increase]
+PI-inspired, deterministic state machine: NORMAL → DETECTING → MITIGATING → RECOVERING.
+When stick-slip is detected, WOB is reduced proportionally to CSS severity and RPM is
+raised to push through the torsional resonance. See README for control equations.
 """
 
 from __future__ import annotations
@@ -292,32 +261,11 @@ def simulate_drillstring_response(
     config: ControllerConfig | None = None,
 ) -> pd.DataFrame:
     """
-    Simulate post-controller drill string response using a torsional
-    spring-damper model.
+    Simulate drill string torsional response under controller setpoints.
 
-    The model computes what the surface measurements *would* look like
-    after the controller applies its WOB and RPM setpoints, providing
-    a before-vs-after comparison for visualisation.
+    Euler integration of:  I × dω/dt = T_drive − k × θ − c × ω − τ_bit(WOB)
 
-    Physics
-    -------
-    Simplified torsional equation of motion:
-
-        I × dω/dt = T_drive - k × θ - c × ω - τ_bit(WOB)
-
-    where:
-        I   = drill string rotational inertia (kg·m²)
-        ω   = bit angular velocity (rad/s)
-        θ   = string angular twist (rad)
-        T_drive = drive torque proportional to setpoint error
-        k   = torsional stiffness (Nm/rad)
-        c   = viscous damping (Nm·s/rad)
-        τ_bit = bit-rock friction torque (WOB-dependent Coulomb model)
-
-    Returns
-    -------
-    pd.DataFrame
-        ctrl_df with added columns: sim_rpm, sim_torque, sim_rop.
+    Returns ctrl_df with added columns: sim_rpm, sim_torque, sim_rop.
     """
     cfg = config or ControllerConfig()
 

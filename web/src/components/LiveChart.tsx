@@ -119,7 +119,7 @@ const LiveChart = forwardRef<LiveChartHandle, Props>(function LiveChart(
   const containerRef = useRef<HTMLDivElement>(null);
   const totalSRef = useRef(0);
 
-  // Expose cursor control to SimulationEngine — updates DOM directly, no re-render
+  // Cursor moves via direct DOM — calling setCursorFraction() never triggers a re-render
   useImperativeHandle(
     ref,
     () => ({
@@ -202,7 +202,7 @@ const LiveChart = forwardRef<LiveChartHandle, Props>(function LiveChart(
 
   return (
     <div ref={containerRef} className="relative select-none">
-      {/* Cursor overlay — positioned via direct DOM, never triggers chart re-render */}
+      {/* Cursor line — positioned via DOM ref by the parent's rAF loop */}
       <div
         ref={cursorLineRef}
         className="absolute pointer-events-none z-20"

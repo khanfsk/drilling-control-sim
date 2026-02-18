@@ -146,9 +146,7 @@ export default function SimulationEngine({
     [processed]
   );
 
-  // ── Playback state ──────────────────────────────────────────────────────
-  // cursorIdxRef: updated at 60fps, drives DOM cursor + scrubber
-  // cursorIdx (state): throttled to ~15fps, drives readings/gauge/state machine
+  // Ref updated at 60fps for DOM cursor; state throttled to ~15fps for React renders
   const cursorIdxRef = useRef(0);
   const [cursorIdx, setCursorIdx] = useState(0);
   const [playing, setPlaying] = useState(false);
@@ -157,12 +155,12 @@ export default function SimulationEngine({
   const lastFrameRef = useRef<number>(0);
   const lastDisplayRef = useRef<number>(0);
 
-  // DOM refs for zero-render-cost cursor updates
+  // DOM refs — updated directly in the rAF loop, no React re-render cost
   const scrubFillRef = useRef<HTMLDivElement>(null);
   const scrubTimeRef = useRef<HTMLSpanElement>(null);
   const liveChartRef = useRef<LiveChartHandle>(null);
 
-  // EMA for gauge — attack fast, release slowly (prevents confusing flicker)
+  // Attack-release EMA: gauge rises at 40%/update, falls at 8%/update
   const smoothedCssRef = useRef(0);
   const [displayCss, setDisplayCss] = useState(0);
 
@@ -194,13 +192,13 @@ export default function SimulationEngine({
         const frac =
           processed.length > 1 ? newIdx / (processed.length - 1) : 0;
 
-        // ── Direct DOM updates — zero React re-renders ──
+        // Direct DOM — no React re-render
         if (scrubFillRef.current) {
           scrubFillRef.current.style.width = `${frac * 100}%`;
         }
         liveChartRef.current?.setCursorFraction(frac);
 
-        // ── Throttled React update ~15fps ───────────────
+        // Throttled React update (~15fps)
         if (ts - lastDisplayRef.current >= 66) {
           lastDisplayRef.current = ts;
 

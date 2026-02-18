@@ -1,37 +1,9 @@
 """
-detection.py
-------------
-Torsional dysfunction detection engine.
+detection.py — Torsional stick-slip detection engine.
 
-Core engineering insight (Volve dataset-specific)
---------------------------------------------------
-Surface RPM barely oscillates during MWD-confirmed stick-slip events
-(observed ±1 rpm) because the top drive actively holds rotary speed.
-The drill string behaves as a torsional spring: it absorbs the downhole
-oscillations before they reach the surface. This means a surface-only
-RPM-based SSI will miss the majority of events (recall ≈ 0.01 in this
-dataset).
-
-Implication for detection architecture
----------------------------------------
-1. **MWD downhole channel** (`mwd_ss_pktopk`) is used as primary ground
-   truth when available (transmitted at MWD survey intervals).
-2. **Surface torque deviation** is used as continuous real-time proxy
-   because torque *does* respond (mildly) to downhole oscillations.
-3. **Composite Severity Score (CSS)** fuses both signals into a unified
-   0–1 index that drives the controller.
-
-This architecture mirrors real rig automation systems (e.g., Soft Torque
-Rotary System, National Oilwell Varco's Top Drive controller) where the
-downhole measurement is the authority signal and surface torque provides
-the continuous feedback loop.
-
-Stick-Slip Severity Categories
---------------------------------
-  0.00 – 0.25 : STABLE     (no dysfunction)
-  0.25 – 0.50 : MILD       (monitor; no action required)
-  0.50 – 0.75 : MODERATE   (reduce WOB 10–20%)
-  0.75 – 1.00 : SEVERE     (reduce WOB 25–35%, increase RPM)
+Computes a Composite Severity Score (CSS) that fuses MWD downhole PKtoPK
+RPM (60%), surface torque deviation (30%), and surface RPM oscillation (10%)
+into a unified 0–1 index used by the controller.
 """
 
 from __future__ import annotations
@@ -267,12 +239,7 @@ def compute_torsional_frequency(
 
 
 def validate_against_mwd(df: pd.DataFrame) -> dict[str, float]:
-    """
-    Compare surface-derived CSS against MWD downhole stick-slip measurements.
-
-    Key metric: even with 40% weighting, surface torque correlation with
-    MWD captures most moderate/severe events (recall on severe events).
-    """
+    """Compare CSS against MWD downhole measurements. Returns precision, recall, r."""
     if "mwd_ss_pktopk" not in df.columns:
         return {}
 

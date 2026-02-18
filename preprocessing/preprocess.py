@@ -1,18 +1,10 @@
 """
-preprocess.py
--------------
-Run this script once locally to transform the raw Volve time-series CSV
-into a compact JSON payload for the Next.js web dashboard.
+preprocess.py — One-time pipeline that converts the raw Volve CSV into JSON
+for the Next.js dashboard. Run from the project root:
 
-Outputs (written to ../web/public/data/)
------------------------------------------
-  telemetry.json  — downsampled drilling time series (~2–4 MB)
-  events.json     — per-event summary table
-  metadata.json   — well info, detection stats, validation results
+    python preprocessing/preprocess.py
 
-Usage
------
-  python preprocessing/preprocess.py
+Outputs written to web/public/data/: telemetry.json, events.json, metadata.json
 """
 
 from __future__ import annotations

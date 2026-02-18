@@ -1,14 +1,9 @@
 "use client";
 
 /**
- * TelemetryCharts — Nielsen #3: User control and freedom.
- * Users can switch between channels freely. Each panel has:
- *  - A plain-English title and description (Nielsen #2: match real world)
- *  - An inline "What am I looking at?" callout (Nielsen #10: help and docs)
- *  - Units on every axis (CRAP Contrast: critical info stands out)
- *
- * Nielsen #6: Recognition over recall — channel names are spelled out,
- * not abbreviated. Severity thresholds are labelled on-chart.
+ * TelemetryCharts — tabbed view of all 5 telemetry channels.
+ * Each panel includes a plain-English description and a callout explaining
+ * what the signal means in a drilling engineering context.
  */
 
 import { useState } from "react";
@@ -99,7 +94,7 @@ export default function TelemetryCharts({ telemetry, events }: Props) {
       className="rounded-xl border border-[#1a1a1a] bg-[#0b0b0b]"
       aria-label="Drilling telemetry charts"
     >
-      {/* Panel header — CRAP Alignment: tabs flush with content below */}
+      {/* Panel header */}
       <div className="border-b border-[#141414] px-4 pt-4 pb-0">
         <div className="flex items-start justify-between gap-4 flex-wrap mb-3">
           <div>
@@ -117,7 +112,7 @@ export default function TelemetryCharts({ telemetry, events }: Props) {
           </p>
         </div>
 
-        {/* Tab row — CRAP Repetition: same tab anatomy for every channel */}
+        {/* Tab row */}
         <div
           className="flex gap-0.5 -mb-px overflow-x-auto"
           role="tablist"
@@ -153,7 +148,7 @@ export default function TelemetryCharts({ telemetry, events }: Props) {
         />
       </div>
 
-      {/* Callout — Nielsen #10: Help and documentation (inline, not hidden in a modal) */}
+      {/* Callout — engineering context for the active channel */}
       <div className="border-t border-[#111] px-4 py-3 flex gap-2 items-start">
         <span className="text-[10px] font-bold text-[#374151] uppercase tracking-widest shrink-0 mt-0.5">
           Context
