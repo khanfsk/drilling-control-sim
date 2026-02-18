@@ -4,7 +4,7 @@
 
 Built on real WITSML telemetry from Equinor's Volve open dataset (Well 15/9-F-9 A, 2009). The system detects stick-slip torsional vibration from surface and downhole sensors, then simulates a PI-inspired state machine controller that autonomously adjusts Weight-on-Bit (WOB) and rotary speed (RPM) to suppress it.
 
-**Live demo:** [drillmanage.com](https://drillmanage.com) · [drilling-control-sim.vercel.app](https://drilling-control-sim.vercel.app)
+**Live demo:** [drillmanage.com](https://autodriller.xyz/) · [drilling-control-sim.vercel.app](https://drilling-control-sim.vercel.app)
 
 ---
 
