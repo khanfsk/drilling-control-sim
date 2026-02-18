@@ -1,0 +1,58 @@
+{
+  "well": "15/9-F-9 A",
+  "field": "Volve",
+  "operator": "Equinor (Statoil)",
+  "license": "NPD Open Government Data",
+  "section": "12.25 in",
+  "depth_range_m": [
+    424.1,
+    1205.9
+  ],
+  "drilling_days": 6.7,
+  "on_bottom_samples": 22179,
+  "downsampled_samples": 11090,
+  "n_events": 8,
+  "severe_events": 1,
+  "moderate_events": 3,
+  "mwd_max_pktopk_rpm": 381.0,
+  "key_insight": "Surface RPM variation during MWD-confirmed stick-slip events was \u00b11 rpm while downhole PKtoPK oscillation reached 381 rpm \u2014 a 380\u00d7 attenuation by the drill string acting as a torsional spring. This demonstrates why downhole MWD data is essential for reliable stick-slip detection in this well.",
+  "detection": {
+    "method": "Composite Severity Score (CSS)",
+    "css_threshold": 0.25,
+    "min_duration_s": 20.0,
+    "signals": {
+      "mwd_downhole": "50% weight \u2014 primary ground truth (MWD PKtoPK RPM)",
+      "surface_torque": "40% weight \u2014 continuous proxy (torque deviation from rolling baseline)",
+      "surface_rpm": "10% weight \u2014 attenuated but still present (std/mean RPM)"
+    }
+  },
+  "validation": {
+    "pearson_r": 0.7576,
+    "precision": 1.0,
+    "recall": 0.0795,
+    "f1": 0.1473,
+    "n_samples": 973,
+    "mwd_mean_pktopk_rpm": 68.2,
+    "mwd_max_pktopk_rpm": 381.0
+  },
+  "torsional_frequency": {
+    "dominant_freq_hz": 0.05455,
+    "period_s": 18.3,
+    "oscillations_per_minute": 3.27
+  },
+  "controller": {
+    "type": "Proportional State-Machine (PI-inspired, Soft Torque pattern)",
+    "states": [
+      "NORMAL",
+      "DETECTING",
+      "MITIGATING",
+      "RECOVERING"
+    ],
+    "nominal_wob_kkgf": 6.761,
+    "nominal_rpm": 110.0,
+    "kp_wob": 0.3,
+    "wob_min_fraction": 0.35,
+    "rpm_max_increase_rpm": 25.0,
+    "detection_holdoff_s": 25.0
+  }
+}
