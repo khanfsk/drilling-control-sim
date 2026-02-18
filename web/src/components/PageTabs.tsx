@@ -3,6 +3,7 @@
 import { useState } from "react";
 import type { TelemetryRow, DrillingEvent, Metadata } from "@/lib/types";
 import TelemetryCharts from "./TelemetryCharts";
+import OverlayChart from "./OverlayChart";
 import SimulationEngine from "./SimulationEngine";
 import EventsTable from "./EventsTable";
 import AttenuationBadge from "./AttenutationBadge";
@@ -63,8 +64,11 @@ export default function PageTabs({
       {tab === "overview" && (
         <div className="space-y-5 animate-fade-in">
 
-          {/* 5-channel telemetry chart */}
+          {/* 5-channel telemetry chart (tabbed, per-channel) */}
           <TelemetryCharts telemetry={telemetry} events={events} />
+
+          {/* All channels overlaid on a single normalized chart */}
+          <OverlayChart data={telemetry} events={events} />
 
           {/* Lower 3-column panel */}
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
